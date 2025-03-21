@@ -1,0 +1,63 @@
+#define BLYNK_PRINT Serial 
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <BlynkSimpleEsp32.h>
+#include <LiquidCrystal_I2C.h>
+
+// Blynk authentication token
+char auth[] = "YourAuthToken"; // Replace with your Blynk auth token
+// WiFi credentials
+char ssid[] = "***********"; // Replace with your WiFi SSID
+char pass[] = "**********"; // Replace with your WiFi password
+
+// Define the pin connected to the MQ135 sensor
+const int MQ135_PIN = 36; // GPIO pin connected to AOUT of MQ135
+
+// Initialize the I2C LCD (address 0x27, 16 columns, 2 rows)
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
+void setup() {
+  // Initialize Serial communication
+  Serial.begin(115200);
+
+  // Initialize Blynk
+  Blynk.begin(auth, ssid, pass);
+
+  // Initialize the I2C LCD
+  lcd.begin();
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("CO2 Monitor");
+
+  // Set the MQ135 pin as input
+  pinMode(MQ135_PIN, INPUT);
+}
+
+void loop() {
+  // Run Blynk
+  Blynk.run();
+  
+  // Read the analog value from the MQ135 sensor
+  int analogValue = analogRead(MQ135_PIN);
+  
+  // Convert the analog value to a CO2 concentration in ppm
+  float voltage = analogValue * (3.3 / 4095.0);
+  float co2_ppm = map(voltage, 0.4, 2.0, 400, 10000); // Modify the mapping according to your sensor's datasheet
+  
+  // Send the CO2 value to the Blynk app
+  Blynk.virtualWrite(V1, co2_ppm);
+  
+  // Print the CO2 value to the Serial Monitor
+  Serial.print("CO2: ");
+  Serial.print(co2_ppm);
+  Serial.println(" ppm");
+
+  // Display the CO2 value on the I2C LCD
+  lcd.setCursor(0, 1);
+  lcd.print("CO2: ");
+  lcd.print(co2_ppm);
+  lcd.print(" ppm");
+
+  // Update every second
+  delay(1000);
+}
