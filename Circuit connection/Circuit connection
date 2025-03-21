@@ -1,0 +1,27 @@
+MQ135 Sensor:
+______________________
+AOUT → GPIO 36 (ESP32)
+
+VCC → 3.3V
+
+GND → GND
+
+
+  
+I2C LCD:
+______________
+
+SDA → GPIO 21 (ESP32)
+
+SCL → GPIO 22 (ESP32)
+
+VCC → 5V
+
+GND → GND
+
+
+  Power:
+________________
+
+ESP32 powered via USB or external 5V supply.
+
